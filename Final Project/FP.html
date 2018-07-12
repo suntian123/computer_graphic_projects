@@ -1,0 +1,107 @@
+﻿<!DOCTYPE html>
+<meta charset="UTF-8">
+<html>
+<head>
+<title>Programming Assignment 1</title>
+<style>
+    body {
+        background-color: #EEEEEE;
+    }
+    label {
+        white-space: pre;
+    }
+</style>
+
+<!-- vertex shader -->
+<script type="x-shader/x-vertex" id="vshader-source">
+    attribute vec3 a_coords;
+    attribute vec3 a_normal;
+    attribute vec4 aVertexColor;
+    uniform mat4 modelview;
+    uniform mat4 projection;
+    uniform mat3 normalMatrix;
+    uniform vec4 lightPosition;
+    
+    varying vec3 diffuseColor;
+    uniform vec3 specularColor;
+    uniform float specularExponent;
+    varying vec4 v_color;
+    varying vec3 v_surfaceToLight;
+    varying vec3 diffuse;
+    uniform float uislight;
+    uniform float uisland;
+    uniform float uiscar;
+    uniform float uiswheel;
+    uniform float uisring;
+    uniform float uistree;
+    uniform float uissun;
+    void main() {
+        
+        
+        vec4 coords = vec4(a_coords,1.0);
+        vec4 eyeCoords = modelview* coords;
+        gl_Position = projection * eyeCoords;
+        vec3 N, L, R, V;  // vectors for lighting equation
+        N = normalize( normalMatrix*a_normal );
+        if ( lightPosition.w == 0.0 ) {
+            L = normalize( lightPosition.xyz );
+        }
+        else {
+            L = normalize( lightPosition.xyz/lightPosition.w - eyeCoords.xyz );
+        }
+        R = -reflect(L,N);
+        V = normalize( -eyeCoords.xyz);     // (Assumes a perspective projection.)
+        
+        
+        if ( dot(L,N) <= 0.0 ) {
+          v_color = vec4(0,0,0,1);
+        }
+        vec3 color = vec3(0,0,0);
+        if(dot(L,N) > 0.0 ){
+            if(uislight==1.0){diffuseColor=vec3(2,2,0);}
+            else if(uisland==1.0){diffuseColor=vec3(0,1,0);}
+            else if(uiscar==1.0){diffuseColor=vec3(1,0,1);}
+            else if(uiswheel==1.0){diffuseColor=vec3(1,1,1); }
+            else if(uisring==1.0){diffuseColor=vec3(1,1,1); }
+            else if(uistree==1.0){diffuseColor=vec3(1,0.5,0.3); }
+            else{diffuseColor=vec3(1,1,1);}
+
+            color=0.5*dot(L,N) * diffuseColor;
+            if (dot(R,V) > 0.0) {
+            }
+            
+            v_color =aVertexColor+ vec4(color, 0);
+        }
+    }
+</script>
+
+<!-- fragment shader -->
+<script type="x-shader/x-fragment" id="fshader-source">
+    precision mediump float;
+    varying vec4 v_color;
+    varying vec3 diffuseColor;
+    void main() {
+        gl_FragColor = v_color;
+        
+    }
+</script>
+
+
+<script src="gl-matrix-min.js"></script>
+<script type="text/javascript" src="webgl-utils.js"></script>
+<script src="trackball-rotator.js"></script>
+<script src="models.js"></script>
+<script src = "fp-2.js"></script>
+</head>
+
+<body onload="init()">
+Name: Tian Sun<br/>
+Student ID:57749958<br/>
+
+<div id="canvas-holder">
+      <canvas width=1000 height=1000 id="myGLCanvas" style="background-color:black"></canvas>
+</div>
+
+</body>
+
+</html>
